@@ -41,13 +41,14 @@ vap = VectorAdjustPrior.load_model('v2.pt').cuda()
 
 schedule_parser = lark.Lark(r"""
 !start: (prompt | /[][():]/+)*
-prompt: (emphasized | scheduled | plain | WHITESPACE)*
+prompt: (emphasized | scheduled | alternate | plain | WHITESPACE)*
 !emphasized: "(" prompt ")"
         | "(" prompt ":" prompt ")"
         | "[" prompt "]"
 scheduled: "[" [prompt ":"] prompt ":" [WHITESPACE] NUMBER "]"
+alternate: "[" prompt ("|" prompt)+ "]"
 WHITESPACE: /\s+/
-plain: /([^\\\[\]():]|\\.)+/
+plain: /([^\\\[\]():|]|\\.)+/
 %import common.SIGNED_NUMBER -> NUMBER
 """)
 
@@ -87,6 +88,8 @@ def get_learned_conditioning_prompt_schedules(prompts, steps):
                     tree.children[-1] *= steps
                 tree.children[-1] = min(steps, int(tree.children[-1]))
                 l.append(tree.children[-1])
+            def alternate(self, tree):
+                l.extend(range(1, steps+1))
         CollectSteps().visit(tree)
         return sorted(set(l))
 
@@ -95,6 +98,8 @@ def get_learned_conditioning_prompt_schedules(prompts, steps):
             def scheduled(self, args):
                 before, after, _, when = args
                 yield before or () if step <= when else after
+            def alternate(self, args):
+                yield next(args[(step - 1)%len(args)])
             def start(self, args):
                 def flatten(x):
                     if type(x) == str:
