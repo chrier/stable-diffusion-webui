@@ -2,6 +2,34 @@ import re
 from collections import namedtuple
 from typing import List
 import lark
+import torch
+from torch import nn
+
+
+class VectorAdjustPrior(nn.Module):
+    def __init__(self, hidden_size, inter_dim=64):
+        super().__init__()
+        self.vector_proj = nn.Linear(hidden_size*2, inter_dim, bias=True)
+        self.out_proj = nn.Linear(hidden_size+inter_dim, hidden_size, bias=True)
+
+    def forward(self, z):
+        b, s = z.shape[0:2]
+        x1 = torch.mean(z, dim=1).repeat(s, 1)
+        x2 = z.reshape(b*s, -1)
+        x = torch.cat((x1, x2), dim=1)
+        x = self.vector_proj(x)
+        x = torch.cat((x2, x), dim=1)
+        x = self.out_proj(x)
+        x = x.reshape(b, s, -1)
+        return x
+
+    @classmethod
+    def load_model(cls, model_path, hidden_size=768, inter_dim=64):
+        model = cls(hidden_size=hidden_size, inter_dim=inter_dim)
+        model.load_state_dict(torch.load(model_path)["state_dict"])
+        return model
+
+vap = VectorAdjustPrior.load_model('v2.pt').cuda()
 
 # a prompt like this: "fantasy landscape with a [mountain:lake:0.25] and [an oak:a christmas tree:0.75][ in foreground::0.6][ in background:0.25] [shoddy:masterful:0.5]"
 # will be represented with prompt_schedule like this (assuming steps=100):
@@ -102,10 +130,8 @@ ScheduledPromptConditioning = namedtuple("ScheduledPromptConditioning", ["end_at
 def get_learned_conditioning(model, prompts, steps):
     """converts a list of prompts into a list of prompt schedules - each schedule is a list of ScheduledPromptConditioning, specifying the comdition (cond),
     and the sampling step at which this condition is to be replaced by the next one.
-
     Input:
     (model, ['a red crown', 'a [blue:green:5] jeweled crown'], 20)
-
     Output:
     [
         [
@@ -131,6 +157,7 @@ def get_learned_conditioning(model, prompts, steps):
 
         texts = [x[1] for x in prompt_schedule]
         conds = model.get_learned_conditioning(texts)
+        conds = vap(conds)
 
         cond_schedule = []
         for i, (end_at_step, text) in enumerate(prompt_schedule):
@@ -189,7 +216,6 @@ class MulticondLearnedConditioning:
 def get_multicond_learned_conditioning(model, prompts, steps) -> MulticondLearnedConditioning:
     """same as get_learned_conditioning, but returns a list of ScheduledPromptConditioning along with the weight objects for each prompt.
     For each prompt, the list is obtained by splitting the prompt using the AND separator.
-
     https://energy-based-model.github.io/Compositional-Visual-Generation-with-Composable-Diffusion-Models/
     """
 
@@ -272,7 +298,6 @@ def parse_prompt_attention(text):
       \] - literal character ']'
       \\ - literal character '\'
       anything else - just text
-
     >>> parse_prompt_attention('normal text')
     [['normal text', 1.0]]
     >>> parse_prompt_attention('an (important) word')
