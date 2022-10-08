@@ -143,7 +143,8 @@ git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", bl
 if not is_installed("lpips"):
     run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "requirements for CodeFormer")
 
-run_pip(f"install -r {requirements_file}", "requirements for Web UI")
+if not is_installed("lark"):
+    run_pip(f"install -r {requirements_file}", "requirements for Web UI")
 
 sys.argv += args
 
