@@ -129,9 +129,12 @@ except Exception:
     commit = "<none>"
 print(im_norhu1130)
 print(from_arcalive)
+print("="*75)
+print(f"{' '*32}몰루 Web UI")
+print("="*75)
 print("수정 : 아카라이브 @norhu1130")
 print(f"Python {sys.version}")
-print(f"커밋 해시 : {commit}")
+print(f"Git 커밋 해시 : {commit}")
 
 
 if not is_installed("torch") or not is_installed("torchvision"):
