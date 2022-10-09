@@ -153,7 +153,7 @@ if "--exit" in args:
     exit(0)
 
 def start_webui():
-    print(f"Launching Web UI with arguments: {' '.join(sys.argv[1:])}")
+    print(f"Web UI를 시작 중... Args: {' '.join(sys.argv[1:])}")
     import webui
     webui.webui()
 
