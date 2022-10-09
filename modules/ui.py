@@ -706,7 +706,7 @@ def create_ui(wrap_gradio_gpu_call):
                     height = gr.Slider(minimum=64, maximum=2048, step=64, label="세로", value=512)
 
                 with gr.Row():
-                    restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
+                    restore_faces = gr.Checkbox(label='얼굴 복구', value=False, visible=len(shared.face_restorers) > 1)
                     tiling = gr.Checkbox(label='Tiling', value=False)
 
                 with gr.Row():
@@ -730,7 +730,7 @@ def create_ui(wrap_gradio_gpu_call):
 
                 with gr.Group():
                     with gr.Row():
-                        save = gr.Button('Save')
+                        save = gr.Button('저장')
                         img2img_send_to_img2img = gr.Button('Send to img2img')
                         img2img_send_to_inpaint = gr.Button('Send to inpaint')
                         img2img_send_to_extras = gr.Button('Send to extras')
@@ -738,7 +738,7 @@ def create_ui(wrap_gradio_gpu_call):
                         open_img2img_folder = gr.Button(folder_symbol, elem_id=button_id)
 
                     with gr.Row():
-                        do_make_zip = gr.Checkbox(label="Make Zip when Save?", value=False)
+                        do_make_zip = gr.Checkbox(label="저장할떄 ZIP으로?", value=False)
                     
                     with gr.Row():
                         download_files = gr.File(None, file_count="multiple", interactive=False, show_label=False)
