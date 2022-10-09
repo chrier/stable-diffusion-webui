@@ -296,7 +296,7 @@ def create_seed_inputs():
     with gr.Row():
         with gr.Box():
             with gr.Row(elem_id='seed_row'):
-                seed = (gr.Textbox if cmd_opts.use_textbox_seed else gr.Number)(label='Seed', value=-1)
+                seed = (gr.Textbox if cmd_opts.use_textbox_seed else gr.Number)(label='시드', value=-1)
                 seed.style(container=False)
                 random_seed = gr.Button(random_symbol, elem_id='random_seed')
                 reuse_seed = gr.Button(reuse_symbol, elem_id='reuse_seed')
@@ -1208,13 +1208,13 @@ def create_ui(wrap_gradio_gpu_call):
             column.__exit__()
 
     interfaces = [
-        (txt2img_interface, "txt2img", "txt2img"),
-        (img2img_interface, "img2img", "img2img"),
-        (extras_interface, "Extras", "extras"),
-        (pnginfo_interface, "PNG Info", "pnginfo"),
+        (txt2img_interface, "문장을 이미지로!", "txt2img"),
+        (img2img_interface, "이미지를 이미지로!", "img2img"),
+        (extras_interface, "기타", "extras"),
+        (pnginfo_interface, "PNG 정보", "pnginfo"),
         (modelmerger_interface, "Checkpoint Merger", "modelmerger"),
         (textual_inversion_interface, "Textual inversion", "ti"),
-        (settings_interface, "Settings", "settings"),
+        (settings_interface, "설정", "settings"),
     ]
 
     with open(os.path.join(script_path, "style.css"), "r", encoding="utf8") as file:
