@@ -3,6 +3,7 @@ import os.path
 import sys
 from collections import namedtuple
 import torch
+import molru_config
 from omegaconf import OmegaConf
 
 from ldm.util import instantiate_from_config
@@ -149,15 +150,16 @@ def load_model_weights(model, checkpoint_info):
         model.half()
 
     devices.dtype = torch.float32 if shared.cmd_opts.no_half else torch.float16
+    if molru_config.Config.vae_enable:
+        vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
+        if os.path.exists(vae_file):
+                print(f"VAE weights을 {vae_file}에서 로딩 중..")
+                vae_ckpt = torch.load(vae_file, map_location="cpu")
+                vae_dict = {k: v for k, v in vae_ckpt["state_dict"].items() if k[0:4] != "loss"}
 
-    vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
-    if os.path.exists(vae_file):
-        print(f"VAE weights을 {vae_file}에서 로딩 중..")
-        vae_ckpt = torch.load(vae_file, map_location="cpu")
-        vae_dict = {k: v for k, v in vae_ckpt["state_dict"].items() if k[0:4] != "loss"}
-
-        model.first_stage_model.load_state_dict(vae_dict)
-
+                model.first_stage_model.load_state_dict(vae_dict)
+    else:
+        print("VAE가 비활성화 상태에요. 로드하지 않을게요.")
     model.sd_model_hash = sd_model_hash
     model.sd_model_checkpoint = checkpoint_file
     model.sd_checkpoint_info = checkpoint_info
