@@ -24,14 +24,14 @@ def apply_optimizations():
     ldm.modules.diffusionmodules.model.nonlinearity = silu
 
     if cmd_opts.force_enable_xformers or (cmd_opts.xformers and shared.xformers_available and torch.version.cuda and torch.cuda.get_device_capability(shared.device) == (8, 6)):
-        print("Applying xformers cross attention optimization.")
+        print("XFormers Cross Attention 최적화 적용 중..")
         ldm.modules.attention.CrossAttention.forward = sd_hijack_optimizations.xformers_attention_forward
         ldm.modules.diffusionmodules.model.AttnBlock.forward = sd_hijack_optimizations.xformers_attnblock_forward
     elif cmd_opts.opt_split_attention_v1:
-        print("Applying v1 cross attention optimization.")
+        print("v1 Cross Attention 최적화 적용 중..")
         ldm.modules.attention.CrossAttention.forward = sd_hijack_optimizations.split_cross_attention_forward_v1
     elif not cmd_opts.disable_opt_split_attention and (cmd_opts.opt_split_attention or torch.cuda.is_available()):
-        print("Applying cross attention optimization.")
+        print("Cross Attention 최적화 적용 중..")
         ldm.modules.attention.CrossAttention.forward = sd_hijack_optimizations.split_cross_attention_forward
         ldm.modules.diffusionmodules.model.AttnBlock.forward = sd_hijack_optimizations.cross_attention_attnblock_forward
 

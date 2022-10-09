@@ -339,7 +339,7 @@ class TotalTQDM:
 
     def reset(self):
         self._tqdm = tqdm.tqdm(
-            desc="Total progress",
+            desc="현재 진행률",
             total=state.job_count * state.sampling_steps,
             position=1,
             file=progress_print_out

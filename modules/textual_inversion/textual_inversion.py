@@ -119,7 +119,7 @@ class EmbeddingDatabase:
                 print(traceback.format_exc(), file=sys.stderr)
                 continue
 
-        print(f"Loaded a total of {len(self.word_embeddings)} textual inversion embeddings.")
+        print(f"총 {len(self.word_embeddings)} 개의 텍스트 임베딩을 로드 완료!")
 
     def find_embedding_at_position(self, tokens, offset):
         token = tokens[offset]

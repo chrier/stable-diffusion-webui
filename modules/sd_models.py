@@ -126,7 +126,7 @@ def load_model_weights(model, checkpoint_info):
     checkpoint_file = checkpoint_info.filename
     sd_model_hash = checkpoint_info.hash
 
-    print(f"Loading weights [{sd_model_hash}] from {checkpoint_file}")
+    print(f"Weights [{sd_model_hash}]을 {checkpoint_file}에서 로딩 중")
 
     pl_sd = torch.load(checkpoint_file, map_location="cpu")
     if "global_step" in pl_sd:
@@ -149,7 +149,7 @@ def load_model_weights(model, checkpoint_info):
 
     vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
     if os.path.exists(vae_file):
-        print(f"Loading VAE weights from: {vae_file}")
+        print(f"VAE weights을 {vae_file}에서 로딩 중..")
         vae_ckpt = torch.load(vae_file, map_location="cpu")
         vae_dict = {k: v for k, v in vae_ckpt["state_dict"].items() if k[0:4] != "loss"}
 
@@ -165,7 +165,7 @@ def load_model():
     checkpoint_info = select_checkpoint()
 
     if checkpoint_info.config != shared.cmd_opts.config:
-        print(f"Loading config from: {shared.cmd_opts.config}")
+        print(f"Config를 {shared.cmd_opts.config}에서 로딩 중..")
 
     sd_config = OmegaConf.load(checkpoint_info.config)
     sd_model = instantiate_from_config(sd_config.model)
@@ -180,7 +180,7 @@ def load_model():
 
     sd_model.eval()
 
-    print(f"Model loaded.")
+    print(f"모델 로드 완료!")
     return sd_model
 
 

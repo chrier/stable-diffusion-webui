@@ -63,7 +63,7 @@ def run_python(code, desc=None, errdesc=None):
 
 
 def run_pip(args, desc=None):
-    return run(f'"{python}" -m pip {args} --prefer-binary', desc=f"Installing {desc}", errdesc=f"Couldn't install {desc}")
+    return run(f'"{python}" -m pip {args} --prefer-binary', desc=f"{desc}를 설치 중", errdesc=f"{desc}를 설치하지 못함")
 
 
 def check_run(command):
@@ -111,11 +111,11 @@ except Exception:
     commit = "<none>"
 
 print(f"Python {sys.version}")
-print(f"Commit hash: {commit}")
+print(f"커밋 해시 : {commit}")
 
 
 if not is_installed("torch") or not is_installed("torchvision"):
-    run(f'"{python}" -m {torch_command}', "Installing torch and torchvision", "Couldn't install torch")
+    run(f'"{python}" -m {torch_command}', "Torch", "Torch를 설치하지 못함")
 
 if not skip_torch_cuda_test:
     run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
@@ -141,10 +141,10 @@ git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "C
 git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
 
 if not is_installed("lpips"):
-    run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "requirements for CodeFormer")
+    run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer의 필요 모듈")
 
 if not is_installed("lark"):
-    run_pip(f"install -r {requirements_file}", "requirements for Web UI")
+    run_pip(f"install -r {requirements_file}", "Web UI의 필요 모듈")
 
 sys.argv += args
 
