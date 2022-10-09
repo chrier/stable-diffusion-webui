@@ -6,6 +6,23 @@ import importlib.util
 import shlex
 import platform
 
+im_norhu1130 = """
+                                     #     #    #####    ###   
+#    #  ####  #####  #    # #    #  ##    ##   #     #  #   #  
+##   # #    # #    # #    # #    # # #   # #         # #     # 
+# #  # #    # #    # ###### #    #   #     #    #####  #     # 
+#  # # #    # #####  #    # #    #   #     #         # #     # 
+#   ## #    # #   #  #    # #    #   #     #   #     #  #   #  
+#    #  ####  #    # #    #  ####  ##### #####  #####    ###   
+"""
+from_arcalive = """
+  ##   #####   ####    ##       #      # #    # ###### 
+ #  #  #    # #    #  #  #      #      # #    # #      
+#    # #    # #      #    #     #      # #    # #####  
+###### #####  #      ###### ### #      # #    # #      
+#    # #   #  #    # #    # ### #      #  #  #  #      
+#    # #    #  ####  #    # ### ###### #   ##   ###### 
+                                                       """
 dir_repos = "repositories"
 dir_tmp = "tmp"
 
@@ -109,7 +126,9 @@ try:
     commit = run(f"{git} rev-parse HEAD").strip()
 except Exception:
     commit = "<none>"
-
+print(im_norhu1130)
+print(from_arcalive)
+print("수정 : 아카라이브 @norhu1130")
 print(f"Python {sys.version}")
 print(f"커밋 해시 : {commit}")
 
