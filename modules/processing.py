@@ -257,7 +257,7 @@ def get_fixed_seed(seed):
     if seed is None or seed == '' or seed == -1:
         return int(random.randrange(4294935957) + 31337)
 
-    return seed + 31337
+    return seed
 
 
 def fix_seed(p):
