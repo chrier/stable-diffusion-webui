@@ -255,7 +255,7 @@ def create_random_tensors(shape, seeds, subseeds=None, subseed_strength=0.0, see
 
 def get_fixed_seed(seed):
     if seed is None or seed == '' or seed == -1:
-        return int(random.randrange(4294935957) + 31337)
+        return int(random.randrange(4294935957))
 
     return seed
 
