@@ -135,10 +135,10 @@ print(f"커밋 해시 : {commit}")
 
 
 if not is_installed("torch") or not is_installed("torchvision"):
-    run(f'"{python}" -m {torch_command}', "Torch", "Torch를 설치하지 못함")
+    run(f'"{python}" -m {torch_command}', "Torch 설치 중...", "Torch를 설치하지 못함")
 
 if not skip_torch_cuda_test:
-    run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
+    run_python("import torch; assert torch.cuda.is_available(), 'Torch가 GPU를 쓸 수 없습니다.; --skip-torch-cuda-test를 COMMANDLINE_ARGS 변수에 추가하여 테스트를 건너뛰세요.'")
 
 if not is_installed("gfpgan"):
     run_pip(f"install {gfpgan_package}", "gfpgan")
