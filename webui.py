@@ -4,7 +4,7 @@ import time
 import importlib
 import signal
 import threading
-
+import molru_config
 from fastapi.middleware.gzip import GZipMiddleware
 
 from modules.paths import script_path
@@ -99,7 +99,7 @@ def webui():
         
         app,local_url,share_url = demo.launch(
             share=cmd_opts.share,
-            server_name="0.0.0.0" if cmd_opts.listen else None,
+            server_name="0.0.0.0" if cmd_opts.listen or molru_config.Config.open_public else None,
             server_port=cmd_opts.port,
             debug=cmd_opts.gradio_debug,
             auth=[tuple(cred.split(':')) for cred in cmd_opts.gradio_auth.strip('"').split(',')] if cmd_opts.gradio_auth else None,
