@@ -507,12 +507,12 @@ def create_ui(wrap_gradio_gpu_call):
 
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
-                steps = gr.Slider(minimum=1, maximum=150, step=1, label="샘플링 단계", value=20)
+                steps = gr.Slider(minimum=1, maximum=150, step=1, label="샘플링 단계", value=28)
                 sampler_index = gr.Radio(label='샘플링 방법', elem_id="txt2img_sampling", choices=[x.name for x in samplers], value=samplers[0].name, type="index")
 
                 with gr.Group():
                     width = gr.Slider(minimum=64, maximum=2048, step=64, label="가로", value=512)
-                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="세로", value=512)
+                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="세로", value=768)
 
                 with gr.Row():
                     restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
@@ -527,7 +527,7 @@ def create_ui(wrap_gradio_gpu_call):
                     batch_count = gr.Slider(minimum=1, maximum=cmd_opts.max_batch_count, step=1, label='배치 카운트', value=1)
                     batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='배치 사이즈', value=1)
 
-                cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 스케일', value=7.0)
+                cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 스케일', value=11.0)
 
                 seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs()
 
@@ -698,12 +698,12 @@ def create_ui(wrap_gradio_gpu_call):
                 with gr.Row():
                     resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", show_label=False, choices=["Just resize", "Crop and resize", "Resize and fill"], type="index", value="Just resize")
 
-                steps = gr.Slider(minimum=1, maximum=150, step=1, label="샘플링 단계", value=20)
+                steps = gr.Slider(minimum=1, maximum=150, step=1, label="샘플링 단계", value=28)
                 sampler_index = gr.Radio(label='Sampling method', choices=[x.name for x in samplers_for_img2img], value=samplers_for_img2img[0].name, type="index")
 
                 with gr.Group():
                     width = gr.Slider(minimum=64, maximum=2048, step=64, label="가로", value=512)
-                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="세로", value=512)
+                    height = gr.Slider(minimum=64, maximum=2048, step=64, label="세로", value=768)
 
                 with gr.Row():
                     restore_faces = gr.Checkbox(label='얼굴 복구', value=False, visible=len(shared.face_restorers) > 1)
@@ -714,7 +714,7 @@ def create_ui(wrap_gradio_gpu_call):
                     batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='배치 사이즈', value=1)
 
                 with gr.Group():
-                    cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 스케일', value=7.0)
+                    cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG 스케일', value=11.0)
                     denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.75)
 
                 seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs()
