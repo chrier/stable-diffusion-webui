@@ -16,7 +16,6 @@ import modules.face_restoration
 import modules.gfpgan_model as gfpgan
 import modules.img2img
 
-import modules.lowvram
 import modules.paths
 import modules.scripts
 import modules.sd_hijack
