@@ -108,14 +108,13 @@ def webui():
         )
         
         app.add_middleware(GZipMiddleware,minimum_size=1000)
-        if molru_config.Config.remove_while != True:
-            while 1:
+        while 1:
+            time.sleep(0.5)
+            if getattr(demo, 'do_restart', False):
                 time.sleep(0.5)
-                if getattr(demo, 'do_restart', False):
-                    time.sleep(0.5)
-                    demo.close()
-                    time.sleep(0.5)
-                    break
+                demo.close()
+                time.sleep(0.5)
+                break
 
             sd_samplers.set_samplers()
 
