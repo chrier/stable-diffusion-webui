@@ -108,22 +108,22 @@ def webui():
         )
         
         app.add_middleware(GZipMiddleware,minimum_size=1000)
-
-        while 1:
-            time.sleep(0.5)
-            if getattr(demo, 'do_restart', False):
+        if molru_config.Config.remove_while != True:
+            while 1:
                 time.sleep(0.5)
-                demo.close()
-                time.sleep(0.5)
-                break
+                if getattr(demo, 'do_restart', False):
+                    time.sleep(0.5)
+                    demo.close()
+                    time.sleep(0.5)
+                    break
 
-        sd_samplers.set_samplers()
+            sd_samplers.set_samplers()
 
-        print('Reloading Custom Scripts')
-        modules.scripts.reload_scripts(os.path.join(script_path, "scripts"))
-        print('Reloading modules: modules.ui')
-        importlib.reload(modules.ui)
-        print('Restarting Gradio')
+            print('Reloading Custom Scripts')
+            modules.scripts.reload_scripts(os.path.join(script_path, "scripts"))
+            print('Reloading modules: modules.ui')
+            importlib.reload(modules.ui)
+            print('Restarting Gradio')
 
 
 
