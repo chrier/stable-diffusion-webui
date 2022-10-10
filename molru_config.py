@@ -8,6 +8,7 @@ class Config(object):
     pass_model_check = False  # 모델 데이터 등을 확인하는 절차를 건너뜁니다, 기본 : 비활성화(False)
     pass_install_check = False   # 각종 필요 모듈 체크를 건너뜁니다.  기본 : 비활성화(False)
 
+    hypernetwork_enable = False  # Hyper Network 활성화, 기본 : 비활성화(False)
     v2_enable = False  # V2 활성화, 기본 : 비활성화(False)
     vae_enable = True  # VAE 활성화, 기본 : 활성화(True)
     yaml_enable = True  # YAML 설정 파일 로드, 기본 : 활성화(True)
