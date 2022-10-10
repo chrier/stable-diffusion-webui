@@ -6,7 +6,8 @@ import importlib.util
 import shlex
 import platform
 import molru_config
-
+import requests
+from tqdm import tqdm
 
 im_norhu1130 = """
                                      #     #    #####    ###   
@@ -163,7 +164,14 @@ def prepare_enviroment():
     print("수정 : 아카라이브 @norhu1130")
     print(f"Python {sys.version}")
     print(f"Git 커밋 해시 : {commit}")
+    if not molru_config.Config().pass_git_check:
+        os.makedirs(dir_repos, exist_ok=True)
 
+        git_clone("https://github.com/CompVis/stable-diffusion.git", repo_dir('stable-diffusion'), "Stable Diffusion", stable_diffusion_commit_hash)
+        git_clone("https://github.com/CompVis/taming-transformers.git", repo_dir('taming-transformers'), "Taming Transformers", taming_transformers_commit_hash)
+        git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
+        git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
+        git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
     if not molru_config.Config.pass_install_check:
         print("설치된 모듈을 확인하고 있습니다.")
         if not is_installed("torch") or not is_installed("torchvision"):
@@ -191,14 +199,6 @@ def prepare_enviroment():
             run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
     if not skip_torch_cuda_test:
         run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
-    if not molru_config.Config().pass_git_check:
-        os.makedirs(dir_repos, exist_ok=True)
-
-        git_clone("https://github.com/CompVis/stable-diffusion.git", repo_dir('stable-diffusion'), "Stable Diffusion", stable_diffusion_commit_hash)
-        git_clone("https://github.com/CompVis/taming-transformers.git", repo_dir('taming-transformers'), "Taming Transformers", taming_transformers_commit_hash)
-        git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
-        git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
-        git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
     if not molru_config.Config().pass_model_check:
         print("[ 몰루 Web UI ] 모델 데이터를 확인 중 입니다.")
         model_data_checker()
