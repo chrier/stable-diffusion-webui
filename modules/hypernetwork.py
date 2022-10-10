@@ -4,6 +4,7 @@ import sys
 import traceback
 
 import torch
+import molru_config
 
 from ldm.util import default
 from modules import devices, shared
@@ -49,6 +50,9 @@ def list_hypernetworks(path):
 
 
 def load_hypernetwork(filename):
+    if not molru_config.Config.hypernetwork_enable:
+        shared.loaded_hypernetwork = None
+        return
     path = shared.hypernetworks.get(filename, None)
     if path is not None:
         print(f"Loading hypernetwork {filename}")

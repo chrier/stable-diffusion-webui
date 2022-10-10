@@ -256,5 +256,10 @@
     "extras/CodeFormer weight (0 = maximum effect, 1 = minimum effect)/value": 0,
     "extras/CodeFormer weight (0 = maximum effect, 1 = minimum effect)/minimum": 0.0,
     "extras/CodeFormer weight (0 = maximum effect, 1 = minimum effect)/maximum": 1.0,
-    "extras/CodeFormer weight (0 = maximum effect, 1 = minimum effect)/step": 0.001
+    "extras/CodeFormer weight (0 = maximum effect, 1 = minimum effect)/step": 0.001,
+    "txt2img/\ubc30\ucc28 \uce74\uc6b4\ud2b8/visible": true,
+    "txt2img/\ubc30\ucc28 \uce74\uc6b4\ud2b8/value": 1,
+    "txt2img/\ubc30\ucc28 \uce74\uc6b4\ud2b8/minimum": 1,
+    "txt2img/\ubc30\ucc28 \uce74\uc6b4\ud2b8/maximum": 100,
+    "txt2img/\ubc30\ucc28 \uce74\uc6b4\ud2b8/step": 1
 }

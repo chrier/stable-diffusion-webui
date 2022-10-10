@@ -6,8 +6,6 @@ import importlib.util
 import shlex
 import platform
 import molru_config
-import requests
-from tqdm import tqdm
 
 im_norhu1130 = """
                                      #     #    #####    ###   
@@ -29,32 +27,55 @@ from_arcalive = """
 dir_repos = "repositories"
 python = sys.executable
 git = os.environ.get('GIT', "git")
+def check_empty_dir(dir,fileEx):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    if [file for file in os.listdir(dir) if file.endswith(fileEx)] == []:
+        return True
+    return False
+def download_file(url, save_dir):
+    import requests
+    from tqdm import tqdm
+    response = requests.get(url, stream=True)
+    total_size_in_bytes= int(response.headers.get('content-length', 0))
+    block_size = 1024 # 1 KB
+    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+    with open(save_dir, 'wb') as file:
+        for data in response.iter_content(block_size):
+            progress_bar.update(len(data))
+            file.write(data)
+    progress_bar.close()
 
 def model_data_checker():
     if not os.path.exists(os.path.abspath("models/Stable-diffusion")):
         os.makedirs(os.path.abspath("models/Stable-diffusion"))
     Dir = f'{os.path.abspath("models/Stable-diffusion")}'
-    fileEx = r'.ckpt'
-    if [file for file in os.listdir(Dir) if file.endswith(fileEx)] == []:
-        print("[ 몰루 Web UI ] 확인된 모델 데이터가 없습니다.")
-        print("[ 몰루 Web UI ] 미러 서버에서 다운로드를 진행합니다.")
-        print("만약 모델 데이터가 정상적이라면, pass_check를 활성화해주세요.")
-        response = requests.get("http://protect.norhu1130.tech:8000", stream=True)
-        total_size_in_bytes= int(response.headers.get('content-length', 0))
-        block_size = 1024 # 1 KB
-        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-        with open('models/Stable-diffusion/animefull-final-pruned.ckpt', 'wb') as file:
-            for data in response.iter_content(block_size):
-                progress_bar.update(len(data))
-                file.write(data)
-        progress_bar.close()
-
+    if check_empty_dir(Dir,r'.ckpt'):
+        print("[ 몰루 Web UI ] 모델 파일을 찾을 수 없습니다.")
+        print("미러서버에서 다운로드 합니다.")
+        download_file("http://protect.norhu1130.tech:8000/model","models/Stable-diffusion/animefull-final-pruned.ckpt")
     else:
         print("[ 몰루 Web UI ] 모델 데이터가 확인되었습니다.")
 
+    if molru_config.Config.yaml_enable:
+        if check_empty_dir(Dir,r'.yaml'):
+            print("YAML이 활성화 되었으나, 찾지 못했습니다.")
+            print("미러서버에서 다운로드 합니다.")
+            download_file("http://protect.norhu1130.tech:8000/yaml","models/Stable-diffusion/animefull-final-pruned.yaml")
+        else: print("[ 몰루 Web UI ] YAML 데이터가 확인되었습니다.")
+
+    if molru_config.Config.vae_enable:
+        if check_empty_dir(Dir,r'.pt'):
+            print("VAE가 활성화 되었으나, 찾지 못했습니다.")
+            print("미러서버에서 다운로드 합니다.")
+            download_file("http://protect.norhu1130.tech:8000/vae","models/Stable-diffusion/animefull-final-pruned.vae.pt")
+        else: print("[ 몰루 Web UI ] VAE 데이터가 확인되었습니다.")
+
 def v2_data_checker():
     if not os.path.exists("v2.pt"):
-        print("[ 몰루 Web UI ] v2 파일을 찾을 수 없습니다.")
+        print("[ 몰루 Web UI ] V2 파일을 찾을 수 없습니다.")
+        print("다운로드 중 입니다.")
+        download_file("http://protect.norhu1130.tech:8000/v2","v2.pt")
         return
 
 def extract_arg(args, name):
@@ -181,6 +202,12 @@ def prepare_enviroment():
         if not is_installed("gfpgan"):
             run_pip(f"install {gfpgan_package}", "gfpgan")
 
+        if not is_installed("requests"):
+            run_pip(f"install requests", "requests")
+
+        if not is_installed("tqdm"):
+            run_pip(f"install tqdm", "tqdm")
+
         if not is_installed("clip"):
             run_pip(f"install {clip_package}", "clip")
 
@@ -194,9 +221,9 @@ def prepare_enviroment():
             run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
 
         if not is_installed("lpips"):
-            run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "requirements for CodeFormer")
+            run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer 필요 모듈")
 
-        run_pip(f"install -r {requirements_file}", "requirements for Web UI")
+        run_pip(f"install -r {requirements_file}", "Web UI 필요 모듈")
 
     if not skip_torch_cuda_test:
         run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
@@ -217,7 +244,6 @@ def start_webui():
     print(f"Web UI를 시작 중... 매개 변수 : {' '.join(sys.argv[1:])}")
     import webui
     webui.webui()
-
 
 if __name__ == "__main__":
     prepare_enviroment()

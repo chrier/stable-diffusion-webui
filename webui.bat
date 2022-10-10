@@ -33,6 +33,8 @@ goto :launch
 :skip_venv
 
 :launch
+echo Checking Update
+git pull
 %PYTHON% launch.py
 pause
 exit /b
