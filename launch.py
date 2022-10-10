@@ -5,6 +5,8 @@ import sys
 import importlib.util
 import shlex
 import platform
+import molru_config
+
 
 im_norhu1130 = """
                                      #     #    #####    ###   
@@ -27,7 +29,33 @@ dir_repos = "repositories"
 python = sys.executable
 git = os.environ.get('GIT', "git")
 
+def model_data_checker():
+    if not os.path.exists(os.path.abspath("models/Stable-diffusion")):
+        os.makedirs(os.path.abspath("models/Stable-diffusion"))
+    Dir = f'{os.path.abspath("models/Stable-diffusion")}'
+    fileEx = r'.ckpt'
+    if [file for file in os.listdir(Dir) if file.endswith(fileEx)] == []:
+        print("[ 몰루 Web UI ] 확인된 모델 데이터가 없습니다.")
+        print("[ 몰루 Web UI ] 미러 서버에서 다운로드를 진행합니다.")
+        print("만약 모델 데이터가 정상적이라면, pass_check를 활성화해주세요.")
+        response = requests.get("http://protect.norhu1130.tech:8000", stream=True)
+        total_size_in_bytes= int(response.headers.get('content-length', 0))
+        block_size = 1024 # 1 KB
+        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+        with open('models/Stable-diffusion/animefull-final-pruned.ckpt', 'wb') as file:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                file.write(data)
+        progress_bar.close()
 
+    else:
+        print("[ 몰루 Web UI ] 모델 데이터가 확인되었습니다.")
+
+def v2_data_checker():
+    if not os.path.exists("v2.pt"):
+        print("[ 몰루 Web UI ] v2 파일을 찾을 수 없습니다.")
+        print("미러 서버에서 다운로드를 진행합니다.")
+        return
 def extract_arg(args, name):
     return [x for x in args if x != name], name in args
 
@@ -136,52 +164,56 @@ def prepare_enviroment():
     print(f"Python {sys.version}")
     print(f"Git 커밋 해시 : {commit}")
 
-    if not is_installed("torch") or not is_installed("torchvision"):
-        run(f'"{python}" -m {torch_command}', "Torch를 설치 중..", "Torch를 설치하지 못했어요.")
+    if not molru_config.Config.pass_install_check:
+        print("설치된 모듈을 확인하고 있습니다.")
+        if not is_installed("torch") or not is_installed("torchvision"):
+            run(f'"{python}" -m {torch_command}', "Torch를 설치 중.. [ 종료하지 말고 기다려 주세요. ]", "Torch를 설치하지 못했어요.")
 
+        if not is_installed("gfpgan"):
+            run_pip(f"install {gfpgan_package}", "gfpgan")
+
+        if not is_installed("clip"):
+            run_pip(f"install {clip_package}", "clip")
+
+        if not is_installed("lpips"):
+            run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer의 요구"
+            )
+        if not is_installed("lark"):
+            run_pip(f"install -r {requirements_file}", "Web UI 요구")
+
+        if not is_installed("xformers") and xformers and platform.python_version().startswith("3.10"):
+            if platform.system() == "Windows":
+                run_pip("install https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/a/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl", "xformers")
+            elif platform.system() == "Linux":
+                run_pip("install xformers", "xformers")
+
+        if not is_installed("deepdanbooru") and deepdanbooru:
+            run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
     if not skip_torch_cuda_test:
         run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
+    if not molru_config.Config().pass_git_check:
+        os.makedirs(dir_repos, exist_ok=True)
 
-    if not is_installed("gfpgan"):
-        run_pip(f"install {gfpgan_package}", "gfpgan")
-
-    if not is_installed("clip"):
-        run_pip(f"install {clip_package}", "clip")
-
-    if not is_installed("xformers") and xformers and platform.python_version().startswith("3.10"):
-        if platform.system() == "Windows":
-            run_pip("install https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/a/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl", "xformers")
-        elif platform.system() == "Linux":
-            run_pip("install xformers", "xformers")
-
-    if not is_installed("deepdanbooru") and deepdanbooru:
-        run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
-
-    os.makedirs(dir_repos, exist_ok=True)
-
-    git_clone("https://github.com/CompVis/stable-diffusion.git", repo_dir('stable-diffusion'), "Stable Diffusion", stable_diffusion_commit_hash)
-    git_clone("https://github.com/CompVis/taming-transformers.git", repo_dir('taming-transformers'), "Taming Transformers", taming_transformers_commit_hash)
-    git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
-    git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
-    git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
-
-    if not is_installed("lpips"):
-        run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer의 요구")
-    if not is_installed("lark"):
-        run_pip(f"install -r {requirements_file}", "Web UI 요구")
+        git_clone("https://github.com/CompVis/stable-diffusion.git", repo_dir('stable-diffusion'), "Stable Diffusion", stable_diffusion_commit_hash)
+        git_clone("https://github.com/CompVis/taming-transformers.git", repo_dir('taming-transformers'), "Taming Transformers", taming_transformers_commit_hash)
+        git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
+        git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
+        git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
+    if not molru_config.Config().pass_model_check:
+        print("[ 몰루 Web UI ] 모델 데이터를 확인 중 입니다.")
+        model_data_checker()
+    if molru_config.Config.v2_enable:
+        print("[ 몰루 Web UI ] V2 데이터를 확인 중 입니다.")
+        v2_data_checker()
 
     sys.argv += args
 
     if "--exit" in args:
         print("Exiting because of --exit argument")
         exit(0)
-    try:
-        commit = run(f"{git} rev-parse HEAD").strip()
-    except Exception:
-        commit = "<none>"
 
 def start_webui():
-    print(f"Web UI를 시작 중... Args: {' '.join(sys.argv[1:])}")
+    print(f"Web UI를 시작 중... 매개 변수 : {' '.join(sys.argv[1:])}")
     import webui
     webui.webui()
 

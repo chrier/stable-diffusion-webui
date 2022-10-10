@@ -72,10 +72,12 @@ def list_models():
         title, short_model_name = modeltitle(filename, h)
 
         basename, _ = os.path.splitext(filename)
-        config = basename + ".yaml"
-        if not os.path.exists(config):
-            config = shared.cmd_opts.config
-
+        config = shared.cmd_opts.config
+        if os.path.exists(config):
+            if molru_config.Config.yaml_enable:
+                config = basename + ".yaml"
+            else:
+                print("[ 몰루 Web UI ] YAML 설정 파일을 로드하지 않습니다.")
         checkpoints_list[title] = CheckpointInfo(filename, title, h, short_model_name, config)
 
 
