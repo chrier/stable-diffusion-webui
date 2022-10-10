@@ -55,7 +55,6 @@ def model_data_checker():
 def v2_data_checker():
     if not os.path.exists("v2.pt"):
         print("[ 몰루 Web UI ] v2 파일을 찾을 수 없습니다.")
-        print("미러 서버에서 다운로드를 진행합니다.")
         return
 def extract_arg(args, name):
     return [x for x in args if x != name], name in args
