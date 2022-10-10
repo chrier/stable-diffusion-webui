@@ -172,6 +172,7 @@ def prepare_enviroment():
         git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
         git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
         git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
+
     if not molru_config.Config.pass_install_check:
         print("설치된 모듈을 확인하고 있습니다.")
         if not is_installed("torch") or not is_installed("torchvision"):
@@ -183,20 +184,20 @@ def prepare_enviroment():
         if not is_installed("clip"):
             run_pip(f"install {clip_package}", "clip")
 
-        if not is_installed("lpips"):
-            run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer의 요구"
-            )
-        if not is_installed("lark"):
-            run_pip(f"install -r {requirements_file}", "Web UI 요구")
-
         if not is_installed("xformers") and xformers and platform.python_version().startswith("3.10"):
             if platform.system() == "Windows":
-                run_pip("install https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/a/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl", "xformers")
+                run_pip("install https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/c/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl", "xformers")
             elif platform.system() == "Linux":
                 run_pip("install xformers", "xformers")
 
         if not is_installed("deepdanbooru") and deepdanbooru:
             run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
+
+        if not is_installed("lpips"):
+            run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "requirements for CodeFormer")
+
+        run_pip(f"install -r {requirements_file}", "requirements for Web UI")
+
     if not skip_torch_cuda_test:
         run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
     if not molru_config.Config().pass_model_check:

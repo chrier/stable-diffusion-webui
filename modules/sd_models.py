@@ -151,7 +151,13 @@ def load_model_weights(model, checkpoint_info):
     if not shared.cmd_opts.no_half:
         model.half()
 
-    devices.dtype = torch.float32 if shared.cmd_opts.no_half else torch.float16
+    devices.dtype_vae = torch.float32 if shared.cmd_opts.no_half or shared.cmd_opts.no_half_vae else torch.float16
+
+    vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
+
+    if not os.path.exists(vae_file) and shared.cmd_opts.vae_path is not None:
+        vae_file = shared.cmd_opts.vae_path
+
     if molru_config.Config.vae_enable:
         vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
         if os.path.exists(vae_file):
@@ -162,6 +168,9 @@ def load_model_weights(model, checkpoint_info):
                 model.first_stage_model.load_state_dict(vae_dict)
     else:
         print("VAE가 비활성화 상태에요. 로드하지 않을게요.")
+
+    model.first_stage_model.to(devices.dtype_vae)
+
     model.sd_model_hash = sd_model_hash
     model.sd_model_checkpoint = checkpoint_file
     model.sd_checkpoint_info = checkpoint_info
