@@ -65,7 +65,7 @@ def model_data_checker():
         else: print("[ 몰루 Web UI ] YAML 데이터가 확인되었습니다.")
 
     if molru_config.Config.vae_enable:
-        if check_empty_dir(Dir,r'.pt'):
+        if check_empty_dir(Dir,r'.vae.pt'):
             print("VAE가 활성화 되었으나, 찾지 못했습니다.")
             print("미러서버에서 다운로드 합니다.")
             download_file("http://protect.norhu1130.tech:8000/vae","models/Stable-diffusion/animefull-final-pruned.vae.pt")

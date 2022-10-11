@@ -1307,9 +1307,8 @@ Requested path was: {f}
         (pnginfo_interface, "PNG 정보", "pnginfo"),
         (modelmerger_interface, "Checkpoint Merger", "modelmerger"),
         (textual_inversion_interface, "Textual inversion", "ti"),
-        (settings_interface, "설정", "settings"),
     ]
-
+    if not molru_config.Config.
     with open(os.path.join(script_path, "style.css"), "r", encoding="utf8") as file:
         css = file.read()
 
