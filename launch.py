@@ -27,12 +27,14 @@ from_arcalive = """
 dir_repos = "repositories"
 python = sys.executable
 git = os.environ.get('GIT', "git")
+
 def check_empty_dir(dir,fileEx):
     if not os.path.exists(dir):
         os.makedirs(dir)
     if [file for file in os.listdir(dir) if file.endswith(fileEx)] == []:
         return True
     return False
+
 def download_file(url, save_dir):
     import requests
     from tqdm import tqdm

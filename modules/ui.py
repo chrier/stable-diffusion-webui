@@ -897,19 +897,19 @@ def create_ui(wrap_gradio_gpu_call):
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='panel'):
                 with gr.Tabs(elem_id="mode_extras"):
-                    with gr.TabItem('Single Image'):
-                        extras_image = gr.Image(label="Source", source="upload", interactive=True, type="pil")
+                    with gr.TabItem('싱글 이미지'):
+                        extras_image = gr.Image(label="소스", source="upload", interactive=True, type="pil")
 
-                    with gr.TabItem('Batch Process'):
-                        image_batch = gr.File(label="Batch Process", file_count="multiple", interactive=True, type="file")
+                    with gr.TabItem('배치 프로세스'):
+                        image_batch = gr.File(label="배치 프로세스", file_count="multiple", interactive=True, type="file")
 
-                upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="Resize", value=2)
-
-                with gr.Group():
-                    extras_upscaler_1 = gr.Radio(label='Upscaler 1', choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
+                upscaling_resize = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="업스케일링", value=2)
 
                 with gr.Group():
-                    extras_upscaler_2 = gr.Radio(label='Upscaler 2', choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
+                    extras_upscaler_1 = gr.Radio(label='1번 업스케일러', choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
+
+                with gr.Group():
+                    extras_upscaler_2 = gr.Radio(label='2번 업스케일러', choices=[x.name for x in shared.sd_upscalers], value=shared.sd_upscalers[0].name, type="index")
                     extras_upscaler_2_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="Upscaler 2 visibility", value=1)
 
                 with gr.Group():
@@ -919,10 +919,10 @@ def create_ui(wrap_gradio_gpu_call):
                     codeformer_visibility = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer visibility", value=0, interactive=modules.codeformer_model.have_codeformer)
                     codeformer_weight = gr.Slider(minimum=0.0, maximum=1.0, step=0.001, label="CodeFormer weight (0 = maximum effect, 1 = minimum effect)", value=0, interactive=modules.codeformer_model.have_codeformer)
 
-                submit = gr.Button('Generate', elem_id="extras_generate", variant='primary')
+                submit = gr.Button('생성', elem_id="extras_generate", variant='primary')
 
             with gr.Column(variant='panel'):
-                result_images = gr.Gallery(label="Result", show_label=False)
+                result_images = gr.Gallery(label="결과", show_label=False)
                 html_info_x = gr.HTML()
                 html_info = gr.HTML()
                 extras_send_to_img2img = gr.Button('Send to img2img')
@@ -1308,7 +1308,8 @@ Requested path was: {f}
         (modelmerger_interface, "Checkpoint Merger", "modelmerger"),
         (textual_inversion_interface, "Textual inversion", "ti"),
     ]
-    if not molru_config.Config.
+    if not molru_config.Config.disable_settings:
+        interfaces.append((settings_interface, "설정", "settings"))
     with open(os.path.join(script_path, "style.css"), "r", encoding="utf8") as file:
         css = file.read()
 

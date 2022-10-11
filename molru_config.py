@@ -17,6 +17,6 @@ class Config(object):
     # Web UI 서버 관련 설정
     open_public = False  # 외부 접속 활성화, 기본 : 비활성화(False)
     server_port = 7860  # 서버 포트, 기본 : 7860
-    diable_settings = False  # 설정 탭을 제거합니다.
+    disable_settings = False  # 설정 탭을 제거합니다, 기본 : 비활성화(False)
     
-    deepdanbooru = False  # Deepdanbooru를 활성화합니다, 기본 : 비활성화(False)
+    deepdanbooru = True  # Deepdanbooru를 활성화합니다, 기본 : 활성화(True)
