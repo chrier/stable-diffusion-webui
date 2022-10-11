@@ -21,11 +21,11 @@ import piexif
 import gradio as gr
 import gradio.utils
 import gradio.routes
-
+import molru_config
 from modules import sd_hijack
 from modules.paths import script_path
 from modules.shared import opts, cmd_opts
-if cmd_opts.deepdanbooru:
+if molru_config.Config.deepdanbooru:
     from modules.deepbooru import get_deepbooru_tags
 import modules.shared as shared
 from modules.sd_samplers import samplers, samplers_for_img2img
@@ -454,7 +454,7 @@ def create_toprow(is_img2img):
             with gr.Row(scale=1):
                 if is_img2img:
                     interrogate = gr.Button('Interrogate\nCLIP', elem_id="interrogate")
-                    if cmd_opts.deepdanbooru:
+                    if molru_config.Config.deepdanbooru:
                         deepbooru = gr.Button('Interrogate\nDeepBooru', elem_id="deepbooru")
                     else:
                         deepbooru = None
@@ -816,7 +816,7 @@ def create_ui(wrap_gradio_gpu_call):
                 outputs=[img2img_prompt],
             )
 
-            if cmd_opts.deepdanbooru:
+            if molru_config.Config.deepdanbooru:
                 img2img_deepbooru.click(
                     fn=interrogate_deepbooru,
                     inputs=[init_img],

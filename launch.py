@@ -170,7 +170,7 @@ def prepare_enviroment():
 
     args, skip_torch_cuda_test = extract_arg(args, '--skip-torch-cuda-test')
     xformers = '--xformers' in args
-    deepdanbooru = '--deepdanbooru' in args
+    deepdanbooru = molru_config.Config().deepdanbooru
 
     try:
         commit = run(f"{git} rev-parse HEAD").strip()
