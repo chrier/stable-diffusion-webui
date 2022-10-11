@@ -6,7 +6,7 @@ import importlib.util
 import shlex
 import platform
 import molru_config
-
+import time
 im_norhu1130 = """
                                      #     #    #####    ###   
 #    #  ####  #####  #    # #    #  ##    ##   #     #  #   #  
@@ -176,9 +176,17 @@ def prepare_enviroment():
 
     try:
         commit = run(f"{git} rev-parse HEAD").strip()
+        current_hash = run(f'"{git}" rev-parse HEAD', None, f"커밋 해쉬 가져오기 실패..").strip()
+        if not current_hash == commit:
+            print("[ ! ] 현재 구버전을 쓰고 있는것 같아요.")
+            print("일부 문제가 발생할 수 있어요!")
+            time.sleep(1.5)
     except Exception:
         commit = "<none>"
-
+        print("[ ! ] 이런! 무언가 문제가 발생하였어요.")
+        print("커밋 정보를 가져올 수 없어요.")
+        print("이 문제가 계속 발생한다면, 이슈를 올려주세요.")
+        os.exit(1)
     print(im_norhu1130)
     print(from_arcalive)
     print("="*75)
@@ -224,7 +232,6 @@ def prepare_enviroment():
 
         if not is_installed("lpips"):
             run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer 필요 모듈")
-
         run_pip(f"install -r {requirements_file}", "Web UI 필요 모듈")
 
     if not skip_torch_cuda_test:
@@ -237,6 +244,24 @@ def prepare_enviroment():
         v2_data_checker()
 
     sys.argv += args
+    import torch
+
+    print(f"GPU : {torch.cuda.get_device_name(0)}")
+
+    if '--precision full' not in sys.argv and '--no-half' not in sys.argv:
+        if str(torch.cuda.get_device_name(0)).startswith("NVIDIA GeForce GTX 16"):
+            print("! GTX 16XX을 감지했습니다.")
+            print("자동적으로 오류 수정 옵션을 적용합니다.")
+
+            sys.argv += '--no-half'.split()
+            sys.argv += '--precision full'.split()
+
+    if '--xformers' not in sys.argv:
+        if str(torch.cuda.get_device_name(0)).startswith("NVIDIA GeForce RTX 30"):
+            print("! GTX 30XX을 감지했습니다.")
+            print("자동적으로 최적화 옵션을 적용합니다.")
+
+            sys.argv += '--xformers'.split()
 
     if "--exit" in args:
         print("Exiting because of --exit argument")
