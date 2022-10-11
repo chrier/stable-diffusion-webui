@@ -173,6 +173,7 @@ def prepare_enviroment():
     args, skip_torch_cuda_test = extract_arg(args, '--skip-torch-cuda-test')
     xformers = '--xformers' in args
     deepdanbooru = molru_config.Config().deepdanbooru
+    ngrok = '--ngrok' in args
 
     try:
         commit = run(f"{git} rev-parse HEAD").strip()
@@ -233,6 +234,23 @@ def prepare_enviroment():
         if not is_installed("lpips"):
             run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "CodeFormer 필요 모듈")
         run_pip(f"install -r {requirements_file}", "Web UI 필요 모듈")
+        if not is_installed("gfpgan"):
+            run_pip(f"install {gfpgan_package}", "gfpgan")
+
+        if not is_installed("clip"):
+            run_pip(f"install {clip_package}", "clip")
+
+        if not is_installed("xformers") and xformers and platform.python_version().startswith("3.10"):
+            if platform.system() == "Windows":
+                run_pip("install https://github.com/C43H66N12O12S2/stable-diffusion-webui/releases/download/c/xformers-0.0.14.dev0-cp310-cp310-win_amd64.whl", "xformers")
+            elif platform.system() == "Linux":
+                run_pip("install xformers", "xformers")
+
+        if not is_installed("deepdanbooru") and deepdanbooru:
+            run_pip("install git+https://github.com/KichangKim/DeepDanbooru.git@edf73df4cdaeea2cf00e9ac08bd8a9026b7a7b26#egg=deepdanbooru[tensorflow] tensorflow==2.10.0 tensorflow-io==0.27.0", "deepdanbooru")
+
+        if not is_installed("pyngrok") and ngrok:
+            run_pip("install pyngrok", "ngrok")
 
     if not skip_torch_cuda_test:
         run_python("import torch; assert torch.cuda.is_available(), 'Torch is not able to use GPU; add --skip-torch-cuda-test to COMMANDLINE_ARGS variable to disable this check'")
@@ -242,6 +260,19 @@ def prepare_enviroment():
     if molru_config.Config.v2_enable:
         print("[ 몰루 Web UI ] V2 데이터를 확인 중 입니다.")
         v2_data_checker()
+
+    os.makedirs(dir_repos, exist_ok=True)
+
+    git_clone("https://github.com/CompVis/stable-diffusion.git", repo_dir('stable-diffusion'), "Stable Diffusion", stable_diffusion_commit_hash)
+    git_clone("https://github.com/CompVis/taming-transformers.git", repo_dir('taming-transformers'), "Taming Transformers", taming_transformers_commit_hash)
+    git_clone("https://github.com/crowsonkb/k-diffusion.git", repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
+    git_clone("https://github.com/sczhou/CodeFormer.git", repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
+    git_clone("https://github.com/salesforce/BLIP.git", repo_dir('BLIP'), "BLIP", blip_commit_hash)
+
+    if not is_installed("lpips"):
+        run_pip(f"install -r {os.path.join(repo_dir('CodeFormer'), 'requirements.txt')}", "requirements for CodeFormer")
+
+    run_pip(f"install -r {requirements_file}", "requirements for Web UI")
 
     sys.argv += args
     import torch
